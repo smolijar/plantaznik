@@ -1,0 +1,18 @@
+[package]
+name = "plantaznik"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jaroslav Šmolík <grissius@gmail.com>"]
+description = "CLI tool for inlining generated PlantUML diagram links from the source code"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.1.8", features = ["derive"] }
+clap-verbosity-flag = "2.0.0"
+env_logger = "0.10.0"
+glob = "0.3.1"
+lazy_static = "1.4.0"
+log = "0.4.17"
+plantuml_encoding = "2.0.3"
+regex = "1.7.1"
