@@ -1,0 +1,68 @@
+@startuml
+' <style>
+' rectangle {
+'     MinimumWidth 1000
+'     Maxi
+' }
+' </style>
+' left to right direction
+' skinparam dpi 300
+rectangle p1 as "before" #pink {
+    file r1 [
+        === README.md
+
+        ----
+        ""...""
+        ""<!~-- plantaznik:./docs/diagrams/foo.plantuml -->""
+        <color:OrangeRed>""![](???)""
+        ""...""
+    ]
+    folder d1 as "/docs/diagrams" {
+        file f1 [
+        === foo.planutml
+
+        ----
+        <code>
+        ...
+        Bob -> Alice
+        ...
+        </code>
+        ]
+    }
+}
+
+card plantaznik [
+    
+    ' <img:https://i.imgur.com/D8R5MF4.png>
+    == ""$ plantaznik ""
+
+]
+
+rectangle p2 as "after" #palegreen {
+    file r2 [
+        === README.md
+
+        ----
+        ""...""
+        ""<!~-- plantaznik:./docs/diagrams/foo.plantuml -->""
+        <color:Green>""![](https://www.plantuml.com/plantuml/svg/0IC0tFz0StHXSd...)""
+        ""...""
+    ]
+    folder d2 as "/docs/diagrams" {
+        file f2 [
+        === foo.planutml
+
+        ----
+        <code>
+        ...
+        Bob -> Alice
+        ...
+        </code>
+        ]
+    }
+}
+
+p1 --> plantaznik
+plantaznik --> p2
+
+@enduml
