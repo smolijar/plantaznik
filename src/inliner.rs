@@ -13,7 +13,10 @@ pub struct ReplaceLog {
     pub after: String,
 }
 pub trait Inline {
-    fn inline(&self, path: &Path) -> Result<Vec<ReplaceLog>, Box<dyn Error>>;
+    fn inline(
+        &self,
+        path: &Path,
+    ) -> Result<Vec<Result<ReplaceLog, Box<dyn Error>>>, Box<dyn Error>>;
 }
 pub struct Inliner<E: SourceEncode, M: ManipulateFile> {
     encoder: E,
@@ -35,7 +38,7 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
         &self,
         source: &str,
         path: &Path,
-    ) -> Result<(String, Vec<ReplaceLog>), Box<dyn Error>> {
+    ) -> Result<(String, Vec<Result<ReplaceLog, Box<dyn Error>>>), Box<dyn Error>> {
         // TODO: Map error
         let base = path.parent().expect("Cannot find parent folder");
         lazy_static! {
@@ -54,36 +57,50 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
                 }
                 None => None,
             })
-            .collect::<Result<HashMap<usize, String>, _>>()?;
+            .collect::<Vec<Result<_, _>>>();
 
-        let results = matches
+        let matches_h = matches
             .iter()
-            .map(|(ln, after)| ReplaceLog {
-                after: after.to_string(),
-                ln: ln.clone(),
-                before: lines.get(*ln).map(|t| t.1).unwrap_or("").to_string(),
-                file: path.display().to_string(),
+            .filter_map(|r| match r {
+                Ok((ln, str)) => Some((ln, str)),
+                _ => None,
             })
-            .collect::<Vec<_>>();
+            .collect::<HashMap<&usize, &String>>();
 
         let mut contents = lines
             .iter()
-            .map(|(n, line)| match matches.get(&n) {
+            .map(|(n, line)| match matches_h.get(&n) {
                 Some(replacement) => replacement,
                 _ => *line,
             })
             .collect::<Vec<&str>>()
             .join("\n");
 
-        if let Some(replacement) = matches.get(&lines.len()) {
+        if let Some(replacement) = matches_h.get(&lines.len()) {
             contents += "\n";
             contents += replacement
         }
+
+        let results = matches
+            .into_iter()
+            .map(|result| match result {
+                Ok((ln, after)) => Ok(ReplaceLog {
+                    after: after.to_string(),
+                    ln: ln.clone(),
+                    before: lines.get(ln).map(|t| t.1).unwrap_or("").to_string(),
+                    file: path.display().to_string(),
+                }),
+                Err(e) => Err(e),
+            })
+            .collect::<Vec<_>>();
         Ok((contents, results))
     }
 }
 impl<E: SourceEncode, L: ManipulateFile> Inline for Inliner<E, L> {
-    fn inline(&self, path: &Path) -> Result<Vec<ReplaceLog>, Box<dyn Error>> {
+    fn inline(
+        &self,
+        path: &Path,
+    ) -> Result<Vec<Result<ReplaceLog, Box<dyn Error>>>, Box<dyn Error>> {
         let path = Path::new(path);
         let src = self.file_manipulator.load(path)?;
         let (contents, results) = self.inline_source(&src, path)?;

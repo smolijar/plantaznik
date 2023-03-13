@@ -41,9 +41,21 @@ fn main() {
                 match inliner.inline(&path) {
                     Ok(results) => {
                         for (n, r) in results.iter().enumerate() {
-                            debug!("Replacement {}#{}, LN:{}", path.display(), n, r.ln);
-                            debug!("From: {}", r.before);
-                            debug!("To  : {}", r.after);
+                            match r {
+                                Ok(replacement) => {
+                                    debug!(
+                                        "Replacement {}#{}, LN:{}",
+                                        path.display(),
+                                        n,
+                                        replacement.ln
+                                    );
+                                    debug!("From: {}", replacement.before);
+                                    debug!("To  : {}", replacement.after);
+                                }
+                                Err(e) => {
+                                    error!("Error processing replacement {}: {}", path.display(), e)
+                                }
+                            }
                         }
                         info!("File {} processed successfully", path.display());
                     }
