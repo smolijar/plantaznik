@@ -3,7 +3,13 @@ name = "plantaznik"
 version = "0.1.0"
 edition = "2021"
 authors = ["Jaroslav Šmolík <grissius@gmail.com>"]
-description = "CLI tool for inlining generated PlantUML diagram links from the source code"
+description = "CLI helper for managing PlantUML diagram sources and their previews in Markdown files"
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/grissius/plantaznik"
+repository = "https://github.com/grissius/plantaznik"
+keywords = ["cli", "plantuml", "readme", "encode", "links"]
+categories = ["command-line-utilities", "multimedia::images", "encoding", "development-tools::build-utils"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

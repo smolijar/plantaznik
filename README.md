@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://i.imgur.com/zsSWEnH.png" width="300" />
 
-CLI helper for managing PlantUML diagram sources and their previews in Markdown files.
+CLI helper for managing PlantUML diagram sources and their previews in Markdown files
 </div>
 
 ---
@@ -40,5 +40,6 @@ All targeted input files (assume utf8 encoded markdown files with `\n` lines) ar
  - [ ] Add img alts
  - [x] Continue on error
  - [ ] Skip comments in code blocks
- - [ ] Add license + related projects
+ - [x] Add license
+ - [ ] Add related projects
  - [ ] Add pipeline + publish
