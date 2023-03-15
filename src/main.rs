@@ -38,8 +38,8 @@ fn main() {
                                         debug!("{replacement_display} (no change)");
                                     } else {
                                         debug!("{replacement_display}");
-                                        debug!("+ {}", replacement.before);
-                                        debug!("- {}", replacement.after);
+                                        debug!("- {}", replacement.before);
+                                        debug!("+ {}", replacement.after);
                                     }
                                 }
                                 Err(e) => {
