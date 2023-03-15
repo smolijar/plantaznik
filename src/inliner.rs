@@ -1,22 +1,44 @@
-use std::{collections::HashMap, error::Error, path::Path};
+use std::{
+    collections::HashMap,
+    fmt::{self, Debug},
+    path::Path,
+};
 
 use lazy_static::lazy_static;
 use regex::Regex;
 
-use crate::{encoder::SourceEncode, file_manipulator::ManipulateFile};
+use crate::{
+    encoder::{PlantumlEncodingError, SourceEncode},
+    file_manipulator::{FileManipulatorError, ManipulateFile},
+};
+
+pub enum ReplacementError {
+    EncodingError(PlantumlEncodingError),
+    ReadError(FileManipulatorError),
+}
+// TODO: Maybe better way that this stupido delegate
+impl fmt::Display for ReplacementError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::EncodingError(x) => std::fmt::Display::fmt(x, f),
+            Self::ReadError(x) => std::fmt::Display::fmt(x, f),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct ReplaceLog {
-    pub file: String,
-    pub ln: usize,
     pub before: String,
     pub after: String,
 }
+
+pub struct ReplacementResults {
+    pub file: String,
+    // line + result
+    pub lines: Vec<(usize, Result<ReplaceLog, ReplacementError>)>,
+}
 pub trait Inline {
-    fn inline(
-        &self,
-        path: &Path,
-    ) -> Result<Vec<Result<ReplaceLog, Box<dyn Error>>>, Box<dyn Error>>;
+    fn inline(&self, path: &Path) -> Result<ReplacementResults, FileManipulatorError>;
 }
 pub struct Inliner<E: SourceEncode, M: ManipulateFile> {
     encoder: E,
@@ -29,16 +51,22 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
             file_manipulator,
         }
     }
-    fn gen_img(&self, base: &Path, path: &str) -> Result<String, Box<dyn Error>> {
-        let src = &self.file_manipulator.load(&base.join(Path::new(path)))?;
-        let img = self.encoder.src_to_img(&src)?;
+    fn gen_img(&self, base: &Path, path: &str) -> Result<String, ReplacementError> {
+        let src = &self
+            .file_manipulator
+            .load(&base.join(Path::new(path)))
+            .map_err(|x| ReplacementError::ReadError(x))?;
+        let img = self
+            .encoder
+            .src_to_img(&src)
+            .map_err(|x| ReplacementError::EncodingError(x))?;
         Ok(img)
     }
     fn inline_source(
         &self,
         source: &str,
         path: &Path,
-    ) -> Result<(String, Vec<Result<ReplaceLog, Box<dyn Error>>>), Box<dyn Error>> {
+    ) -> Result<(String, ReplacementResults), FileManipulatorError> {
         // TODO: Map error
         let base = path.parent().expect("Cannot find parent folder");
         lazy_static! {
@@ -53,16 +81,16 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
                 Some(captures) => {
                     let path = captures.get(1).unwrap().as_str();
                     let img_snippet = self.gen_img(base, path);
-                    Some(img_snippet.map(|i| (n + 1, i)))
+                    Some(img_snippet).map(|i| (n + 1, i))
                 }
                 None => None,
             })
-            .collect::<Vec<Result<_, _>>>();
+            .collect::<Vec<(_, Result<_, _>)>>();
 
         let matches_h = matches
             .iter()
-            .filter_map(|r| match r {
-                Ok((ln, str)) => Some((ln, str)),
+            .filter_map(|(ln, r)| match r {
+                Ok(r) => Some((ln, r)),
                 _ => None,
             })
             .collect::<HashMap<&usize, &String>>();
@@ -81,26 +109,29 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
             contents += replacement
         }
 
-        let results = matches
+        let lines = matches
             .into_iter()
-            .map(|result| match result {
-                Ok((ln, after)) => Ok(ReplaceLog {
-                    after: after.to_string(),
-                    ln: ln.clone(),
-                    before: lines.get(ln).map(|t| t.1).unwrap_or("").to_string(),
-                    file: path.display().to_string(),
-                }),
-                Err(e) => Err(e),
+            .map(|(ln, result)| {
+                (
+                    ln,
+                    result.map(|after| ReplaceLog {
+                        after: after.to_string(),
+                        before: lines.get(ln).map(|t| t.1).unwrap_or("").to_string(),
+                    }),
+                )
             })
             .collect::<Vec<_>>();
-        Ok((contents, results))
+        Ok((
+            contents,
+            ReplacementResults {
+                file: path.display().to_string(),
+                lines,
+            },
+        ))
     }
 }
 impl<E: SourceEncode, L: ManipulateFile> Inline for Inliner<E, L> {
-    fn inline(
-        &self,
-        path: &Path,
-    ) -> Result<Vec<Result<ReplaceLog, Box<dyn Error>>>, Box<dyn Error>> {
+    fn inline(&self, path: &Path) -> Result<ReplacementResults, FileManipulatorError> {
         let path = Path::new(path);
         let src = self.file_manipulator.load(path)?;
         let (contents, results) = self.inline_source(&src, path)?;

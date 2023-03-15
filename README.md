@@ -34,11 +34,11 @@ All targeted input files (assume utf8 encoded markdown files with `\n` lines) ar
 
  - [x] Clean up readme
  - [x] Add example diagrams to readme (_taste your own champagnes_)
- - [ ] Improve debug logging
+ - [x] Improve debug logging
  - [ ] Add dry run
  - [ ] Add switch for output (svg/png)
  - [ ] Add img alts
- - [ ] Continue on error
+ - [x] Continue on error
  - [ ] Skip comments in code blocks
  - [ ] Add license + related projects
  - [ ] Add pipeline + publish

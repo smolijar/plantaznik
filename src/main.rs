@@ -17,18 +17,6 @@ fn main() {
         .format_target(false)
         .init();
 
-    warn!("[!]   warn");
-    info!("[!]   info");
-    debug!("[!]  debug");
-
-    debug!("this is a debug {}", "message");
-    error!("this is printed by default");
-
-    error!("[!]  error");
-    warn!("[!]   warn");
-    info!("[!]   info");
-    debug!("[!]  debug");
-
     let args = cli::run();
     let file_manipulator = file_manipulator::FileManipulator::default();
     let encoder = encoder::SourceEncoder::default();
@@ -37,27 +25,34 @@ fn main() {
     for entry in glob(&args.glob).expect("Failed to read glob pattern") {
         match entry {
             Ok(path) => {
-                println!("{:?}", path.display());
+                let mut ok = 0;
                 match inliner.inline(&path) {
                     Ok(results) => {
-                        for (n, r) in results.iter().enumerate() {
+                        for (ln, r) in results.lines.iter() {
+                            let replacement_display =
+                                format!("Replacement {}:{}", path.display(), ln);
                             match r {
                                 Ok(replacement) => {
-                                    debug!(
-                                        "Replacement {}#{}, LN:{}",
-                                        path.display(),
-                                        n,
-                                        replacement.ln
-                                    );
-                                    debug!("From: {}", replacement.before);
-                                    debug!("To  : {}", replacement.after);
+                                    ok += 1;
+                                    if replacement.before == replacement.after {
+                                        debug!("{replacement_display} (no change)");
+                                    } else {
+                                        debug!("{replacement_display}");
+                                        debug!("+ {}", replacement.before);
+                                        debug!("- {}", replacement.after);
+                                    }
                                 }
                                 Err(e) => {
-                                    error!("Error processing replacement {}: {}", path.display(), e)
+                                    warn!("{replacement_display}: {e}")
                                 }
                             }
                         }
-                        info!("File {} processed successfully", path.display());
+                        info!(
+                            "File {} processed ({}/{} successful replacements)",
+                            path.display(),
+                            ok,
+                            results.lines.len()
+                        );
                     }
                     Err(err) => {
                         error!("Error processing file {}: {}", path.display(), err)
@@ -65,7 +60,7 @@ fn main() {
                 }
             }
             Err(e) => {
-                println!("{:?}", e)
+                error!("{:?}", e)
             }
         }
     }
