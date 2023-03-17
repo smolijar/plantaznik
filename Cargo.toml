@@ -1,6 +1,6 @@
 [package]
 name = "plantaznik"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Jaroslav Šmolík <grissius@gmail.com>"]
 description = "CLI helper for managing PlantUML diagram sources and their previews in Markdown files"
