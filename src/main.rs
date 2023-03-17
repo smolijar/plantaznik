@@ -28,7 +28,7 @@ fn main() {
                 let mut ok = 0;
                 match inliner.inline(&path) {
                     Ok(results) => {
-                        for (ln, r) in results.lines.iter() {
+                        for (ln, r) in results.lines.iter () {
                             let replacement_display =
                                 format!("Replacement {}:{}", path.display(), ln);
                             match r {
@@ -38,8 +38,8 @@ fn main() {
                                         debug!("{replacement_display} (no change)");
                                     } else {
                                         debug!("{replacement_display}");
-                                        debug!("+ {}", replacement.before);
-                                        debug!("- {}", replacement.after);
+                                        debug!("- {}", replacement.before);
+                                        debug!("+ {}", replacement.after);
                                     }
                                 }
                                 Err(e) => {

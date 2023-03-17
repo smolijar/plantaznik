@@ -19,7 +19,7 @@ impl From<FromPlantumlError> for PlantumlEncodingError {
 }
 
 fn encode(source: &str) -> Result<String, FromPlantumlError> {
-    Ok(encode_plantuml_deflate(source)?)
+    encode_plantuml_deflate(source)
 }
 
 pub trait SourceEncode {

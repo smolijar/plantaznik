@@ -42,11 +42,11 @@ pub trait ManipulateFile {
 pub struct FileManipulator {}
 impl ManipulateFile for FileManipulator {
     fn load(&self, path: &Path) -> Result<String, FileManipulatorError> {
-        Ok(fs::read_to_string(path)
-            .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Read))?)
+        fs::read_to_string(path)
+            .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Read))
     }
     fn replace_contents(&self, path: &Path, contents: &str) -> Result<(), FileManipulatorError> {
-        Ok(fs::write(path, contents)
-            .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Write))?)
+        fs::write(path, contents)
+            .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Write))
     }
 }

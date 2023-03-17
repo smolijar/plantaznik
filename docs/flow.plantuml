@@ -1,12 +1,4 @@
 @startuml
-' <style>
-' rectangle {
-'     MinimumWidth 1000
-'     Maxi
-' }
-' </style>
-' left to right direction
-' skinparam dpi 300
 rectangle p1 as "before" #pink {
     file r1 [
         === README.md

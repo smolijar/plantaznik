@@ -55,11 +55,11 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
         let src = &self
             .file_manipulator
             .load(&base.join(Path::new(path)))
-            .map_err(|x| ReplacementError::ReadError(x))?;
+            .map_err(ReplacementError::ReadError)?;
         let img = self
             .encoder
-            .src_to_img(&src)
-            .map_err(|x| ReplacementError::EncodingError(x))?;
+            .src_to_img(src)
+            .map_err(ReplacementError::EncodingError)?;
         Ok(img)
     }
     fn inline_source(
@@ -115,7 +115,7 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
                 (
                     ln,
                     result.map(|after| ReplaceLog {
-                        after: after.to_string(),
+                        after,
                         before: lines.get(ln).map(|t| t.1).unwrap_or("").to_string(),
                     }),
                 )
@@ -198,7 +198,7 @@ mod tests {
                 Ok(if path.ends_with("README.md") {
                     "<!-- plantaznik:./e/f/g/foo.plantuml -->".to_string()
                 } else {
-                    format!("[{}]", path.to_string_lossy().to_string())
+                    format!("[{}]", path.to_string_lossy())
                 })
             }
             fn replace_contents(

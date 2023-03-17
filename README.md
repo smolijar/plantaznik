@@ -27,15 +27,26 @@ $ cargo install plantaznik
 In your Markdown files, include the following declarations in the comment:
 ```html
 <!-- plantaznik:./path/to/plantuml/source.plantuml -->
-EMPTY_OR_PLACEHOLDER_LINE_THAT_WILL_GET_REPLACED
+(this line will be replaced)
 ```
 
 The declarations include a path to the source file, which is relative to the current file.
 
 ```sh
-$ plantaznik '**/*.md'
+$ plantaznik README.md
 ```
 All targeted input files (assume utf8 encoded markdown files with `\n` lines) are processed and the lines following the declerations are replaced by a Markdown syntax image, pointing to official PlantUML server with your source code encoded in the link.
+
+Example of verbose output:
+```sh
+$ plantaznik README.md -vvv
+[DEBUG] Replacement README.md:4
+[DEBUG] - ![]()
+[DEBUG] + ![](https://www.plantuml.com/plantuml/svg/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000)
+[DEBUG] Replacement README.md:42 (no change)
+[WARN ] Replacement README.md:93: Error accessing file: Read ./missing-diagram.plantuml (caused by: No such file or directory (os error 2))
+[INFO ] File README.md processed (2/3 successful replacements)
+```
 
 ## TODO
 
@@ -49,4 +60,4 @@ All targeted input files (assume utf8 encoded markdown files with `\n` lines) ar
  - [ ] Skip comments in code blocks
  - [x] Add license
  - [ ] Add related projects
- - [ ] Add pipeline + publish
+ - [x] Add pipeline + publish
