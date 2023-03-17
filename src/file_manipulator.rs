@@ -38,15 +38,35 @@ pub trait ManipulateFile {
     fn replace_contents(&self, path: &Path, contents: &str) -> Result<(), FileManipulatorError>;
 }
 
-#[derive(Default)]
-pub struct FileManipulator {}
+pub enum FileMode {
+    ReadOnly,
+    ReadWrite,
+}
+pub struct FileManipulator {
+    mode: FileMode,
+}
+impl FileManipulator {
+    pub fn new(mode: FileMode) -> FileManipulator {
+        FileManipulator { mode }
+    }
+}
 impl ManipulateFile for FileManipulator {
     fn load(&self, path: &Path) -> Result<String, FileManipulatorError> {
         fs::read_to_string(path)
             .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Read))
     }
     fn replace_contents(&self, path: &Path, contents: &str) -> Result<(), FileManipulatorError> {
-        fs::write(path, contents)
-            .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Write))
+        match self.mode {
+            FileMode::ReadOnly => {
+                log::trace!("Skipping file write due to readonly mode");
+                Ok(())
+            }
+            FileMode::ReadWrite => {
+                log::trace!("Writing file contents {}", path.display());
+                fs::write(path, contents).map_err(|e| {
+                    FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Write)
+                })
+            }
+        }
     }
 }

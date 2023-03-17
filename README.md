@@ -2,6 +2,10 @@
 <img src="https://i.imgur.com/zsSWEnH.png" width="300" />
 
 CLI helper for managing PlantUML diagram sources and their previews in Markdown files
+
+
+[![](https://flat.badgen.net/github/checks/grissius/plantaznik)](https://github.com/grissius/plantaznik/actions/workflows/test.yaml?query=branch%3Amaster++)
+[![](https://flat.badgen.net/crates/v/plantaznik)](https://crates.io/crates/plantaznik)
 </div>
 
 ---
@@ -13,7 +17,7 @@ PlantUML is a great tool for managing software spec diagrams. Unless you are on 
 Plantaznik is a tool you can integrate into your workflow, that does the menial job for you: find referenced PlantUML sources, generate links and update in the Markdown docs.
 
 <!-- plantaznik:./docs/flow.plantuml -->
-![](https://www.plantuml.com/plantuml/svg/pLHBJ-Cm4BxxLmpUbNRtK3lDxaghgW_O1HOE5L8vW8HwCB6JMdNio74f3vNVpYHjGeeuSCI7oEF9p7mF9uTb43wiSaE-mR0C3qQDSUTL4eJDZ88dZAerrLRdg_nAox20VXH5pRcurxZTLEMyhJSg3H0SU9qj0aXTzTFEOgPSQbi8BtAGXOQVsETrLj47KGAzLQdpYiANGjib0gZ6f1hplWytTLIjqMW4ivEZu-a9ooLfZtkuse1InXYbdNXuyDphGM643UBHwkM0SUcIaaijCWHLyjGvLgTH4cmsxbGF4sUS7rnuHAjcIcBku6R-VJAP_DYRyJfpliNkZ5GUv9RT_ZowuzToJDzoR02j0dhqFaq49b7s9iJvxVwlkuNU68wCJjIxBmpvVl4MyePi24c4bnsfThZg1vgjysom2A4e1vnhXj7AiyJb_FZFxFVqz1ShRBRjYXme_TfjXEgGEUaQ7zVIY3GeN_akZCgyKdRF_FWpcF-_WhKplc6_Ng_Rgbg29k3bNSQZytzHE7sCBiFPzQL4I1-xBF67BalyQIuBVhieM4TSqZ6ypiI472ehgr_D2m00)
+![](https://www.plantuml.com/plantuml/svg/pLDFRu8m5B_tKzHkoRO3hP8jMGZ-szHj1xD4BqkCXqeB8m8bfSx4nNtsFK0PB1uysWFXyNZl_Vwy3ZB3jTd44TBICpm98edJ3kOP9YlfAoq9lah3P8s_4ORZXv3N7Rmeelnqkrqy6mz7qp6D1Qe-Mt2gW11AAI6rs6tzM1PE8vuOlal2jKEPK5x6HCW3pUEC-KhH8WtGe5clLkrwAbBQUTU0LiwaW5nhiRpjz_jtZHb_CvSbTXK9gR4esJNdaGE_YgF_d-CHqCQ0LgTf0Z0XUrK8ywlt9xN2LWyFez2J9tzmMREuXBn7UuGyhaLDgWEkud63tJ0Ed4zZqinXBAGGRJJrLCn6ZxE7wUIUfabGTWKEX5pN6u4wQ8dgnjk5DDmtKkU-yqW6MigaORvz2UQ_vB0EnX_PRxVRgggGu1Ymx2jWxRVdjfdisdFp-Z4N0EcyPR7FMXRxOfO5xYu8LXCNrGmlCZP20vc8_Ch_0W00)
 
 ## Getting started
 
@@ -21,6 +25,8 @@ Plantaznik is a tool you can integrate into your workflow, that does the menial 
 ```sh
 $ cargo install plantaznik
 ```
+
+Alternatively download a precompiled version from [releases](https://github.com/grissius/plantaznik/releases).
 
 ### How to use
 
@@ -53,7 +59,9 @@ $ plantaznik README.md -vvv
  - [x] Clean up readme
  - [x] Add example diagrams to readme (_taste your own champagnes_)
  - [x] Improve debug logging
- - [ ] Add dry run
+ - [x] Add dry run
+ - [ ] Add check
+ - [ ] Add anyhow
  - [ ] Add switch for output (svg/png)
  - [ ] Add img alts
  - [x] Continue on error
