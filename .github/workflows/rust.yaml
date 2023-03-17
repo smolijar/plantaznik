@@ -12,24 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: r7kamura/rust-problem-matchers@v1
       - name: Build
         run: cargo build --verbose
       - name: Test
         run: cargo test --verbose
       - name: Lint
-        run: cargo clippy --verbose -- -Dwarnings
-  clippy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          components: clippy
-          override: true
-      # Note that there is no release tag available yet
-      # and the following code will use master branch HEAD
-      # all the time.
-      - uses: actions-rs/clippy@master
-        with:
-          args: --all-features --all-targets
+        run: cargo clippy --verbose

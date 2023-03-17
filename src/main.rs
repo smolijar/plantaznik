@@ -18,6 +18,7 @@ fn main() {
         .init();
 
     let args = cli::run();
+    let foo = String::from("").to_string();
     let file_manipulator = file_manipulator::FileManipulator::default();
     let encoder = encoder::SourceEncoder::default();
     let inliner = inliner::Inliner::new(encoder, file_manipulator);
