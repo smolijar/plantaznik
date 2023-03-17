@@ -54,18 +54,21 @@ $ plantaznik README.md -vvv
 [INFO ] File README.md processed (2/3 successful replacements)
 ```
 
-## TODO
+### Advanced usage
+ - Use globbing to target more files `$ plantaznik '**/*.md'`
+ - Increase verbosity with repeated `v` swtich `$ plantaznik README.md -vvvv`. Error (default), Warning, Info, Trace
+ - Declarations Markdown codeblocks are automatically skipped
 
- - [x] Clean up readme
- - [x] Add example diagrams to readme (_taste your own champagnes_)
- - [x] Improve debug logging
- - [x] Add dry run
- - [ ] Add check + status codes
- - [ ] Add anyhow
- - [ ] Add switch for output (svg/png)
- - [ ] Add img alts
- - [x] Continue on error
- - [ ] Skip comments in code blocks
- - [x] Add license
- - [ ] Add related projects
- - [x] Add pipeline + publish
+## TODO
+ - [ ] Add check mode + status codes
+ - [ ] Add switch for output (svg/png) (or preserve mode)
+ - [ ] Add img alts (or preserve mode)
+ - [ ] Bail option
+
+
+## Alternatives
+
+ - [puml-for-markdown](https://github.com/danielyaa5/puml-for-markdown) - Lot of features, including the url shortening. [I had troubles running it myself for some reason](https://github.com/danielyaa5/puml-for-markdown/issues/9). The advantage of plantaznik are in my opinion speed, simplicity, better file filtering (glob support) and relative path handing (not always towards to root, but relative to file).
+ - [Workaround for public repos on GitHub](https://stackoverflow.com/a/32771815)
+ - [GitLab support](https://docs.gitlab.com/ee/administration/integration/plantuml.html)
+ - [Mermaid on GitHub](https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/)

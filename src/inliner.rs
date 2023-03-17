@@ -79,8 +79,15 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
 
         let lines = source.split('\n').enumerate().collect::<Vec<_>>();
 
+        let mut ignore_block = false;
         let matches = lines
             .iter()
+            .filter(|(_, line)| {
+                if line.starts_with("```") {
+                    ignore_block = !ignore_block;
+                }
+                !ignore_block
+            })
             .filter_map(|(n, line)| match RE.captures(line) {
                 Some(captures) => {
                     let path = captures.get(1).unwrap().as_str();
@@ -222,5 +229,15 @@ mod tests {
             file_manipulator: MockFileManipulator::default(),
         };
         inliner.inline(Path::new("a/b/c/d/README.md")).unwrap();
+    }
+    #[test]
+    fn test_inline_codeblocks() {
+        let inliner = Inliner {
+            encoder: MockEncoder::default(),
+            file_manipulator: MockFileManipulator::default(),
+        };
+        let path = Path::new("README.md");
+        let md_source = "# Foo\n```sh\n<!--plantaznik:./path-->\n```\n";
+        assert_eq!(inliner.inline_source(md_source, path).unwrap().0, md_source);
     }
 }
