@@ -1,22 +1,10 @@
-use std::{error::Error, fmt};
+use thiserror::Error;
 
 use plantuml_encoding::{encode_plantuml_deflate, FromPlantumlError};
 
-#[derive(Debug)]
-pub struct PlantumlEncodingError {
-    cause: FromPlantumlError,
-}
-impl Error for PlantumlEncodingError {}
-impl fmt::Display for PlantumlEncodingError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Error encoding PlantUML source: {}", self.cause.0)
-    }
-}
-impl From<FromPlantumlError> for PlantumlEncodingError {
-    fn from(value: FromPlantumlError) -> Self {
-        PlantumlEncodingError { cause: value }
-    }
-}
+#[derive(Error, Debug)]
+#[error("Error encoding PlantUML source: {0}")]
+pub struct PlantumlEncodingError(String);
 
 fn encode(source: &str) -> Result<String, FromPlantumlError> {
     encode_plantuml_deflate(source)
@@ -31,7 +19,7 @@ pub struct SourceEncoder {}
 impl SourceEncode for SourceEncoder {
     fn src_to_img(&self, source: &str) -> Result<String, PlantumlEncodingError> {
         // TODO: Alt from title/filename?
-        let encoded = encode(source)?;
+        let encoded = encode(source).map_err(|e| PlantumlEncodingError(e.0))?;
         Ok(format!(
             "![](https://www.plantuml.com/plantuml/svg/{encoded})"
         ))

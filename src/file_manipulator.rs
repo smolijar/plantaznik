@@ -1,36 +1,12 @@
 use std::{fs, io, path::Path};
+use thiserror::Error;
 
-use std::{error::Error, fmt};
-
-#[derive(Debug)]
-pub enum FileManipulatorErrorAccess {
-    Read,
-    Write,
-}
-#[derive(Debug)]
-pub struct FileManipulatorError {
-    cause: io::Error,
-    path: String,
-    access: FileManipulatorErrorAccess,
-}
-impl Error for FileManipulatorError {}
-impl FileManipulatorError {
-    pub fn new(cause: io::Error, path: &Path, access: FileManipulatorErrorAccess) -> Self {
-        FileManipulatorError {
-            cause,
-            path: path.display().to_string(),
-            access,
-        }
-    }
-}
-impl fmt::Display for FileManipulatorError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "Error accessing file: {:?} {} (caused by: {})",
-            self.access, self.path, self.cause
-        )
-    }
+#[derive(Error, Debug)]
+pub enum FileManipulatorError {
+    #[error("Error reading file {1:?} (caused by: {0})")]
+    ReadError(io::Error, String),
+    #[error("Error writing file {1:?} (caused by: {0})")]
+    WriteError(io::Error, String),
 }
 
 pub trait ManipulateFile {
@@ -53,7 +29,7 @@ impl FileManipulator {
 impl ManipulateFile for FileManipulator {
     fn load(&self, path: &Path) -> Result<String, FileManipulatorError> {
         fs::read_to_string(path)
-            .map_err(|e| FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Read))
+            .map_err(|e| FileManipulatorError::ReadError(e, path.display().to_string()))
     }
     fn replace_contents(&self, path: &Path, contents: &str) -> Result<(), FileManipulatorError> {
         match self.mode {
@@ -63,9 +39,8 @@ impl ManipulateFile for FileManipulator {
             }
             FileMode::ReadWrite => {
                 log::trace!("Writing file contents {}", path.display());
-                fs::write(path, contents).map_err(|e| {
-                    FileManipulatorError::new(e, path, FileManipulatorErrorAccess::Write)
-                })
+                fs::write(path, contents)
+                    .map_err(|e| FileManipulatorError::WriteError(e, path.display().to_string()))
             }
         }
     }

@@ -1,29 +1,28 @@
-use std::{
-    collections::HashMap,
-    fmt::{self, Debug},
-    path::Path,
-};
+use std::{collections::HashMap, fmt::Debug, path::Path};
 
 use lazy_static::lazy_static;
 use regex::Regex;
+use thiserror::Error;
 
 use crate::{
     encoder::{PlantumlEncodingError, SourceEncode},
     file_manipulator::{FileManipulatorError, ManipulateFile},
 };
 
+#[derive(Error, Debug)]
 pub enum ReplacementError {
-    EncodingError(PlantumlEncodingError),
-    ReadError(FileManipulatorError),
+    #[error(transparent)]
+    EncodingError(#[from] PlantumlEncodingError),
+    #[error(transparent)]
+    ReadError(#[from] FileManipulatorError),
 }
-// TODO: Maybe better way that this stupido delegate
-impl fmt::Display for ReplacementError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::EncodingError(x) => std::fmt::Display::fmt(x, f),
-            Self::ReadError(x) => std::fmt::Display::fmt(x, f),
-        }
-    }
+
+#[derive(Error, Debug)]
+pub enum InliningError {
+    #[error("Cannot find parent folder {0}")]
+    InvalidParentFolder(String),
+    #[error(transparent)]
+    ReadError(#[from] FileManipulatorError),
 }
 
 #[derive(Debug)]
@@ -38,7 +37,7 @@ pub struct ReplacementResults {
     pub lines: Vec<(usize, Result<ReplaceLog, ReplacementError>)>,
 }
 pub trait Inline {
-    fn inline(&self, path: &Path) -> Result<ReplacementResults, FileManipulatorError>;
+    fn inline(&self, path: &Path) -> Result<ReplacementResults, InliningError>;
 }
 pub struct Inliner<E: SourceEncode, M: ManipulateFile> {
     encoder: E,
@@ -66,9 +65,14 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
         &self,
         source: &str,
         path: &Path,
-    ) -> Result<(String, ReplacementResults), FileManipulatorError> {
+    ) -> Result<(String, ReplacementResults), InliningError> {
         // TODO: Map error
-        let base = path.parent().expect("Cannot find parent folder");
+        let base = match path.parent() {
+            Some(base) => Ok(base),
+            None => Err(InliningError::InvalidParentFolder(
+                path.display().to_string(),
+            )),
+        }?;
         lazy_static! {
             static ref RE: Regex = Regex::new(r"<!--\s*plantaznik:(\S*)\s*-->").unwrap();
         }
@@ -131,7 +135,7 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
     }
 }
 impl<E: SourceEncode, L: ManipulateFile> Inline for Inliner<E, L> {
-    fn inline(&self, path: &Path) -> Result<ReplacementResults, FileManipulatorError> {
+    fn inline(&self, path: &Path) -> Result<ReplacementResults, InliningError> {
         let path = Path::new(path);
         let src = self.file_manipulator.load(path)?;
         let (contents, results) = self.inline_source(&src, path)?;

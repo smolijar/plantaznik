@@ -60,7 +60,7 @@ $ plantaznik README.md -vvv
  - [x] Add example diagrams to readme (_taste your own champagnes_)
  - [x] Improve debug logging
  - [x] Add dry run
- - [ ] Add check
+ - [ ] Add check + status codes
  - [ ] Add anyhow
  - [ ] Add switch for output (svg/png)
  - [ ] Add img alts
