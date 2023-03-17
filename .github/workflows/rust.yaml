@@ -6,16 +6,32 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    name: Build
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
       - uses: r7kamura/rust-problem-matchers@v1
-      - name: Build
-        run: cargo build --verbose
-      - name: Test
-        run: cargo test --verbose
-      - name: Lint
-        run: cargo clippy --verbose
+      - uses: actions-rs/cargo@v1
+        name: cargo fmt
+        with:
+          command: fmt
+          args: --all -- --check
+      - uses: actions-rs/cargo@v1
+        name: cargo build
+        with:
+          command: build
+      - uses: actions-rs/cargo@v1
+        name: cargo clippy
+        with:
+          command: clippy
+          args: --
+      - uses: actions-rs/cargo@v1
+        name: cargo test
+        with:
+          command: test
