@@ -161,7 +161,7 @@ mod tests {
     struct MockEncoder {}
     impl SourceEncode for MockEncoder {
         fn src_to_img(&self, source: &str) -> Result<String, PlantumlEncodingError> {
-            Ok(format!("<{source}>"))
+            Ok(format!("![](https://www.plantuml.com/plantuml/svg/{source})"))
         }
     }
 
@@ -189,7 +189,7 @@ mod tests {
         let path = Path::new("README.md");
         assert_eq!(
             inliner.inline_source("Hello\n<!-- plantaznik:./foo.plantuml -->\n![](FOO)\nworld\n<!-- plantaznik:./bar.plantuml -->\n![](BAR)\nbrrr!", path).unwrap().0,
-            "Hello\n<!-- plantaznik:./foo.plantuml -->\n<[./foo.plantuml]>\nworld\n<!-- plantaznik:./bar.plantuml -->\n<[./bar.plantuml]>\nbrrr!"
+            "Hello\n<!-- plantaznik:./foo.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[./foo.plantuml])\nworld\n<!-- plantaznik:./bar.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[./bar.plantuml])\nbrrr!"
         );
         assert_eq!(inliner.inline_source("", path).unwrap().0, "");
         assert_eq!(
@@ -197,7 +197,7 @@ mod tests {
                 .inline_source("<!-- plantaznik:./foo.plantuml -->", path)
                 .unwrap()
                 .0,
-            "<!-- plantaznik:./foo.plantuml -->\n<[./foo.plantuml]>"
+            "<!-- plantaznik:./foo.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[./foo.plantuml])"
         );
     }
     #[test]
@@ -219,7 +219,7 @@ mod tests {
             ) -> Result<(), FileManipulatorError> {
                 assert_eq!(
                     contents,
-                    "<!-- plantaznik:./e/f/g/foo.plantuml -->\n<[a/b/c/d/./e/f/g/foo.plantuml]>"
+                    "<!-- plantaznik:./e/f/g/foo.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[a/b/c/d/./e/f/g/foo.plantuml])"
                 );
                 Ok(())
             }
