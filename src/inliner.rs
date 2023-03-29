@@ -4,10 +4,14 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use thiserror::Error;
 
+mod replacer;
+
 use crate::{
     encoder::{PlantumlEncodingError, SourceEncode},
     file_manipulator::{FileManipulatorError, ManipulateFile},
 };
+
+use self::replacer::Replacer;
 
 #[derive(Error, Debug)]
 pub enum ReplacementError {
@@ -50,16 +54,17 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
             file_manipulator,
         }
     }
-    fn gen_img(&self, base: &Path, path: &str) -> Result<String, ReplacementError> {
+    fn create_replacer(&self, base: &Path, path: &str) -> Result<Replacer, ReplacementError> {
         let src = &self
             .file_manipulator
             .load(&base.join(Path::new(path)))
             .map_err(ReplacementError::ReadError)?;
-        let img = self
+        let encoded = self
             .encoder
-            .src_to_img(src)
+            .encode_source(src)
             .map_err(ReplacementError::EncodingError)?;
-        Ok(img)
+
+        Ok(Replacer::new(encoded))
     }
     fn inline_source(
         &self,
@@ -91,7 +96,7 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
             .filter_map(|(n, line)| match RE.captures(line) {
                 Some(captures) => {
                     let path = captures.get(1).unwrap().as_str();
-                    let img_snippet = self.gen_img(base, path);
+                    let img_snippet = self.create_replacer(base, path);
                     Some(img_snippet).map(|i| (n + 1, i))
                 }
                 None => None,
@@ -104,20 +109,18 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
                 Ok(r) => Some((ln, r)),
                 _ => None,
             })
-            .collect::<HashMap<&usize, &String>>();
+            .collect::<HashMap<&usize, &Replacer>>();
 
-        let mut contents = lines
+        let mut new_contents = lines
             .iter()
             .map(|(n, line)| match matches_h.get(&n) {
-                Some(replacement) => replacement,
-                _ => *line,
+                Some(replacer) => replacer.replace_line(line),
+                _ => line.to_string(),
             })
-            .collect::<Vec<&str>>()
-            .join("\n");
+            .collect::<Vec<String>>();
 
-        if let Some(replacement) = matches_h.get(&lines.len()) {
-            contents += "\n";
-            contents += replacement
+        if let Some(replacer) = matches_h.get(&lines.len()) {
+            new_contents.push(replacer.replace_line(""))
         }
 
         let lines = matches
@@ -125,15 +128,16 @@ impl<E: SourceEncode, M: ManipulateFile> Inliner<E, M> {
             .map(|(ln, result)| {
                 (
                     ln,
-                    result.map(|after| ReplaceLog {
-                        after,
-                        before: lines.get(ln).map(|t| t.1).unwrap_or("").to_string(),
+                    result.map(|_| {
+                        let before = lines.get(ln).map(|t| t.1).unwrap_or("").to_string();
+                        let after = new_contents.get(ln).unwrap_or(&"".to_string()).to_string();
+                        ReplaceLog { after, before }
                     }),
                 )
             })
             .collect::<Vec<_>>();
         Ok((
-            contents,
+            new_contents.join("\n"),
             ReplacementResults {
                 file: path.display().to_string(),
                 lines,
@@ -160,8 +164,8 @@ mod tests {
     #[derive(Default)]
     struct MockEncoder {}
     impl SourceEncode for MockEncoder {
-        fn src_to_img(&self, source: &str) -> Result<String, PlantumlEncodingError> {
-            Ok(format!("<{source}>"))
+        fn encode_source(&self, source: &str) -> Result<String, PlantumlEncodingError> {
+            Ok(source.to_string())
         }
     }
 
@@ -189,7 +193,7 @@ mod tests {
         let path = Path::new("README.md");
         assert_eq!(
             inliner.inline_source("Hello\n<!-- plantaznik:./foo.plantuml -->\n![](FOO)\nworld\n<!-- plantaznik:./bar.plantuml -->\n![](BAR)\nbrrr!", path).unwrap().0,
-            "Hello\n<!-- plantaznik:./foo.plantuml -->\n<[./foo.plantuml]>\nworld\n<!-- plantaznik:./bar.plantuml -->\n<[./bar.plantuml]>\nbrrr!"
+            "Hello\n<!-- plantaznik:./foo.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[./foo.plantuml])\nworld\n<!-- plantaznik:./bar.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[./bar.plantuml])\nbrrr!"
         );
         assert_eq!(inliner.inline_source("", path).unwrap().0, "");
         assert_eq!(
@@ -197,7 +201,7 @@ mod tests {
                 .inline_source("<!-- plantaznik:./foo.plantuml -->", path)
                 .unwrap()
                 .0,
-            "<!-- plantaznik:./foo.plantuml -->\n<[./foo.plantuml]>"
+            "<!-- plantaznik:./foo.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[./foo.plantuml])"
         );
     }
     #[test]
@@ -219,7 +223,7 @@ mod tests {
             ) -> Result<(), FileManipulatorError> {
                 assert_eq!(
                     contents,
-                    "<!-- plantaznik:./e/f/g/foo.plantuml -->\n<[a/b/c/d/./e/f/g/foo.plantuml]>"
+                    "<!-- plantaznik:./e/f/g/foo.plantuml -->\n![](https://www.plantuml.com/plantuml/svg/[a/b/c/d/./e/f/g/foo.plantuml])"
                 );
                 Ok(())
             }

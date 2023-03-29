@@ -55,14 +55,26 @@ $ plantaznik README.md -vvv
 ```
 
 ### Advanced usage
- - Use globbing to target more files `$ plantaznik '**/*.md'`
- - Increase verbosity with repeated `v` swtich `$ plantaznik README.md -vvvv`. Error (default), Warning, Info, Trace
+ - Use globbing to target more files `$ plantaznik '**/*.md'`. The links are resolved relative to the current markdown file.
+ - Increase verbosity with repeated `v` swtich `$ plantaznik README.md -vvvv`. Error (default), Warning, Info, Trace. Mute output with `-q`
+ - `--help` to see usage and options
  - Declarations Markdown codeblocks are automatically skipped
+
+#### Preservation mode
+Are you not happy with the default generated links? Run once and modify the generated line to your liking.
+
+If the replacement line already contains a PlantUML link (duck-regex-typed), only the encoded source code will be replaced. Use this to your adventage by customizing the image URL placement, alt text or switching to PNG formats. The given line must not contain links to other diagrams.
+
+
+When running for the first time, the following code is produced: `![](https://www.plantuml.com/plantuml/svg/ENCODED_SOURCE)`, here are some examples on how you can change the line and still get the code synchronization:
+ - `![](https://www.plantuml.com/plantuml/png/ENCODED_SOURCE)` - change the image to PNG
+ - `![Diagram](https://www.plantuml.com/plantuml/svg/ENCODED_SOURCE)` - add alt text
+ - `![](https://mycustomserver.com/plantuml/svg/ENCODED_SOURCE)` - change the server
+ - `<div><img src="https://www.plantuml.com/plantuml/png/ENCODED_SOURCE"></div>` - use custom markup
+ - `[![](https://www.plantuml.com/plantuml/svg/ENCODED_SOURCE)](https://www.plantuml.com/plantuml/uml/ENCODED_SOURCE)` - add hyperlink to edit on public server (uses the link twice)
 
 ## TODO
  - [ ] Add check mode + status codes
- - [ ] Add switch for output (svg/png) (or preserve mode)
- - [ ] Add img alts (or preserve mode)
  - [ ] Bail option
 
 
