@@ -165,7 +165,7 @@ mod tests {
     struct MockEncoder {}
     impl SourceEncode for MockEncoder {
         fn encode_source(&self, source: &str) -> Result<String, PlantumlEncodingError> {
-            Ok(format!("{source}"))
+            Ok(source.to_string())
         }
     }
 
