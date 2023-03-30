@@ -4,6 +4,12 @@
 CLI helper for managing PlantUML diagram sources and their previews in Markdown files
 
 
+⚡&nbsp;Fast |
+💪&nbsp;Powerful&nbsp;file&nbsp;selection |
+✅&nbsp;Check&nbsp;mode&nbsp;for&nbsp;CI |
+🎨&nbsp;Customizable&nbsp;output |
+🪝&nbsp;Ideal&nbsp;for&nbsp;git&nbsp;hooks
+
 [![](https://flat.badgen.net/github/checks/grissius/plantaznik)](https://github.com/grissius/plantaznik/actions/workflows/test.yaml?query=branch%3Amaster++)
 [![](https://flat.badgen.net/crates/v/plantaznik)](https://crates.io/crates/plantaznik)
 </div>
@@ -19,16 +25,14 @@ Plantaznik is a tool you can integrate into your workflow, that does the menial 
 <!-- plantaznik:./docs/flow.plantuml -->
 ![](https://www.plantuml.com/plantuml/svg/pLDFRu8m5B_tKzHkoRO3hP8jMGZ-szHj1xD4BqkCXqeB8m8bfSx4nNtsFK0PB1uysWFXyNZl_Vwy3ZB3jTd44TBICpm98edJ3kOP9YlfAoq9lah3P8s_4ORZXv3N7Rmeelnqkrqy6mz7qp6D1Qe-Mt2gW11AAI6rs6tzM1PE8vuOlal2jKEPK5x6HCW3pUEC-KhH8WtGe5clLkrwAbBQUTU0LiwaW5nhiRpjz_jtZHb_CvSbTXK9gR4esJNdaGE_YgF_d-CHqCQ0LgTf0Z0XUrK8ywlt9xN2LWyFez2J9tzmMREuXBn7UuGyhaLDgWEkud63tJ0Ed4zZqinXBAGGRJJrLCn6ZxE7wUIUfabGTWKEX5pN6u4wQ8dgnjk5DDmtKkU-yqW6MigaORvz2UQ_vB0EnX_PRxVRgggGu1Ymx2jWxRVdjfdisdFp-Z4N0EcyPR7FMXRxOfO5xYu8LXCNrGmlCZP20vc8_Ch_0W00)
 
-## Getting started
-
-### Installation
+## Installation
 ```sh
 $ cargo install plantaznik
 ```
 
 Alternatively download a precompiled version from [releases](https://github.com/grissius/plantaznik/releases).
 
-### How to use
+## Getting started
 
 In your Markdown files, include the following declarations in the comment:
 ```html
@@ -50,17 +54,35 @@ $ plantaznik README.md -vvv
 [DEBUG] - ![]()
 [DEBUG] + ![](https://www.plantuml.com/plantuml/svg/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000)
 [DEBUG] Replacement README.md:42 (no change)
-[WARN ] Replacement README.md:93: Error accessing file: Read ./missing-diagram.plantuml (caused by: No such file or directory (os error 2))
+[ERROR] Replacement README.md:93: Error accessing file: Read ./missing-diagram.plantuml (caused by: No such file or directory (os error 2))
 [INFO ] File README.md processed (2/3 successful replacements)
+```
+
+## Usage
+
+```
+CLI helper for managing PlantUML diagram sources and their previews in Markdown files
+
+Usage: plantaznik [OPTIONS] <GLOB>
+
+Arguments:
+  <GLOB>  README files glob pattern to process
+
+Options:
+  -d, --dry-run     Dry run (skips file writes)
+  -c, --check-only  Check (skips file writes and error if updates would take place)
+  -v, --verbose...  More output per occurrence
+  -q, --quiet...    Less output per occurrence
+  -h, --help        Print help
+  -V, --version     Print version
 ```
 
 ### Advanced usage
  - Use globbing to target more files `$ plantaznik '**/*.md'`. The links are resolved relative to the current markdown file.
  - Increase verbosity with repeated `v` swtich `$ plantaznik README.md -vvvv`. Error (default), Warning, Info, Trace. Mute output with `-q`
  - `--help` to see usage and options
- - Declarations Markdown codeblocks are automatically skipped
 
-#### Preservation mode
+### Preservation mode
 Are you not happy with the default generated links? Run once and modify the generated line to your liking.
 
 If the replacement line already contains a PlantUML link (duck-regex-typed), only the encoded source code will be replaced. Use this to your adventage by customizing the image URL placement, alt text or switching to PNG formats. The given line must not contain links to other diagrams.
@@ -73,10 +95,12 @@ When running for the first time, the following code is produced: `![](https://ww
  - `<div><img src="https://www.plantuml.com/plantuml/png/ENCODED_SOURCE"></div>` - use custom markup
  - `[![](https://www.plantuml.com/plantuml/svg/ENCODED_SOURCE)](https://www.plantuml.com/plantuml/uml/ENCODED_SOURCE)` - add hyperlink to edit on public server (uses the link twice)
 
-## TODO
- - [ ] Add check mode + status codes
- - [ ] Bail option
+### Notes
+ - Declarations Markdown codeblocks are automatically skipped
 
+## Roadmap
+
+Currently, I am happy with the features and functionality, if there is something that you would like to see, feel free to open an issue! 
 
 ## Alternatives
 
