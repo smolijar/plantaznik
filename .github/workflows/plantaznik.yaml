@@ -1,0 +1,16 @@
+name: Plantaznik
+
+on: push
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo install plantaznik
+      - run: plantaznik '**/*.md' --check-only -vvvv

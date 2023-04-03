@@ -98,6 +98,12 @@ When running for the first time, the following code is produced: `![](https://ww
 ### Notes
  - Declarations Markdown codeblocks are automatically skipped
 
+### Using in CI
+
+You can use the check mode (`--check-only`) to make sure all diagrams are in sync. Copy the GitHub Actions workflow directly ([plantaznik.yaml](https://github.com/grissius/plantaznik/tree/master/.github/workflows/plantaznik.yaml), change the glob pattern if needed) or use it as an inspiration for your CI.
+
+You can preview [example runs on this repo](https://github.com/grissius/plantaznik/actions/workflows/plantaznik.yaml).
+
 ## Roadmap
 
 Currently, I am happy with the features and functionality, if there is something that you would like to see, feel free to open an issue! 
