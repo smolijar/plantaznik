@@ -14,16 +14,18 @@ CLI helper for managing PlantUML diagram sources and their previews in Markdown 
 [![](https://flat.badgen.net/crates/v/plantaznik)](https://crates.io/crates/plantaznik)
 </div>
 
----
-
 ## Motivation
 
 PlantUML is a great tool for managing software spec diagrams. Unless you are on GitLab, which has [built-in support](https://docs.gitlab.com/ee/administration/integration/plantuml.html) for interpreting PlantUML diagram sources you need to get [hacky and inconvenient](https://stackoverflow.com/a/32771815) and even more so for private repos.
 
+
+<!-- plantaznik:./docs/steps.plantuml -->
+![](https://www.plantuml.com/plantuml/svg/9Ov12i8m44NtESM86rruWHQaOWikB4Z1bRWOcf64fjEIJ5hgwMtZNxx7XrS4GI-nTsedXdg2q96qPb6piOxWS5ImBcleGvwu9NWuP7dMzyJ34FtAB4DJNSgwoXFTb-YxwuASDP5Xt0xuPTlzRNR3YI2E80De54fmz3HPcWCuort85R5E0UhqCbPhulVfh3G9jaOLgzo2Vm00)
+
 Plantaznik is a tool you can integrate into your workflow, that does the menial job for you: find referenced PlantUML sources, generate links and update in the Markdown docs.
 
-<!-- plantaznik:./docs/flow.plantuml -->
-![](https://www.plantuml.com/plantuml/svg/pLDFRu8m5B_tKzHkoRO3hP8jMGZ-szHj1xD4BqkCXqeB8m8bfSx4nNtsFK0PB1uysWFXyNZl_Vwy3ZB3jTd44TBICpm98edJ3kOP9YlfAoq9lah3P8s_4ORZXv3N7Rmeelnqkrqy6mz7qp6D1Qe-Mt2gW11AAI6rs6tzM1PE8vuOlal2jKEPK5x6HCW3pUEC-KhH8WtGe5clLkrwAbBQUTU0LiwaW5nhiRpjz_jtZHb_CvSbTXK9gR4esJNdaGE_YgF_d-CHqCQ0LgTf0Z0XUrK8ywlt9xN2LWyFez2J9tzmMREuXBn7UuGyhaLDgWEkud63tJ0Ed4zZqinXBAGGRJJrLCn6ZxE7wUIUfabGTWKEX5pN6u4wQ8dgnjk5DDmtKkU-yqW6MigaORvz2UQ_vB0EnX_PRxVRgggGu1Ymx2jWxRVdjfdisdFp-Z4N0EcyPR7FMXRxOfO5xYu8LXCNrGmlCZP20vc8_Ch_0W00)
+<!-- plantaznik:./docs/before-after.plantuml -->
+![](https://www.plantuml.com/plantuml/svg/pLF1Re904BtlLwoR9cqFxYffauOWQgkcFPWcUcbYFApiW4HWoRBMrCP-UrSe28q7Z-w1y1XcvhqtiuDCSwMtSOHGIwyX1fnjG7lhBwJ0qpm98i1f5_CCanNuKW71tmYRuuScehfuaQFZwVLwU3OUZgPZ6WjKVMwRKm52AAM4rB3J-cctSHhnHFDz4cvioeJqCYP27YWUPyoNakPXGz8KSslPZYSZgUntPNZ238Jhh4oujLZUzVlz-qQRKzjbGLz60XGMXRHcor9Y9TF_BxFajDL7uyugDTm4k1Kq_QltPxd2RHSFez23ipyuh9bSK3wW0q8ULwBcrX-l_76BdJ0ExBNMQMOp5bA3jefwCcQZfzdZTF90qoGegXeDXDpK2nbtq1BLfsxbrd1VWseEtRg6eQSyWa019AUXbyftkrsLdCil0Si-0zPvU-deoRuprwyVSs6ONROeraMBObtDefXBQtohUOngmyuZ5a83ICJnxly2)
 
 ## Installation
 ```sh

@@ -1,12 +1,14 @@
 @startuml
-rectangle p1 as "before" #pink {
+
+!theme sketchy
+rectangle p1 as "before" {
     file r1 [
         === README.md
 
         ----
         ""...""
         ""<!~-- plantaznik:./docs/diagrams/foo.plantuml -->""
-        <color:OrangeRed>""![](???)""
+        <color:OrangeRed><b>""![](???)""
         ""...""
     ]
     folder d1 as "/docs/diagrams" {
@@ -30,14 +32,14 @@ card plantaznik [
 
 ]
 
-rectangle p2 as "after" #palegreen {
+rectangle p2 as "after" {
     file r2 [
         === README.md
 
         ----
         ""...""
         ""<!~-- plantaznik:./docs/diagrams/foo.plantuml -->""
-        <color:Green>""![](https://www.plantuml.com/plantuml/svg/0IC0tFz0StHXSd...)""
+        <color:palegreen><b>""![](https://www.plantuml.com/plantuml/svg/0IC0tFz0StHXSd...)""
         ""...""
     ]
     folder d2 as "/docs/diagrams" {

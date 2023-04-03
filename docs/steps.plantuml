@@ -1,0 +1,12 @@
+@startuml
+!theme sketchy
+while ()
+    :Reference PlantUML
+    source in README;
+    #DarkCyan:Run plantaznik;
+    :Have up to date
+    previews links;
+endwhile
+-[hidden]->
+detach
+@enduml
